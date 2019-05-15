@@ -10,8 +10,7 @@ import (
 	"github.com/gruntwork-io/terragrunt/options"
 )
 
-// Represents a stack of Terraform modules (i.e. folders with Terraform templates) that you can "spin up" or
-// "spin down" in a single command
+// Represents a stack of Terraform modules (i.e. folders with Terraform templates) on which you can apply -all commands
 type Stack struct {
 	Path    string
 	Modules []*TerraformModule

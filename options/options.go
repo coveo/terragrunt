@@ -75,7 +75,7 @@ type TerragruntOptions struct {
 	ErrWriter io.WriteCloser
 
 	// A command that can be used to run Terragrunt with the given options. This is useful for running Terragrunt
-	// multiple times (e.g. when spinning up a stack of Terraform modules). The actual command is normally defined
+	// multiple times (e.g. with -all appended to your command). The actual command is normally defined
 	// in the cli package, which depends on almost all other packages, so we declare it here so that other
 	// packages can use the command without a direct reference back to the cli package (which would create a
 	// circular dependency).
