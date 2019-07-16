@@ -32,10 +32,10 @@ type TerragruntExtensionBase struct {
 	_config *TerragruntConfigFile
 
 	Name        string   `hcl:",key"`
-	DisplayName string   `hcl:"display_name"`
-	Description string   `hcl:"description"`
-	OS          []string `hcl:"os"`
-	Disabled    bool     `hcl:"disabled"`
+	DisplayName string   `hcl:"display_name,omitempty"`
+	Description string   `hcl:"description,omitempty"`
+	OS          []string `hcl:"os,omitempty"`
+	Disabled    bool     `hcl:"disabled,omitempty"`
 }
 
 func (base TerragruntExtensionBase) String() string      { return base.id() }

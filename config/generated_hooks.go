@@ -44,7 +44,7 @@ func (list *HookList) merge(imported HookList, mode mergeMode, argName string) {
 	newList := make(HookList, 0, len(imported))
 	for _, item := range imported {
 		name := IHook(&item).id()
-		if pos, exist := index[name]; exist {
+		if pos, exist := index[name]; name != "" && exist {
 			// It already exist in the list, so is is an override
 			// We remove it from its current position and add it to the list of newly added elements to keep its original declaration ordering.
 			newList = append(newList, (*list)[pos])

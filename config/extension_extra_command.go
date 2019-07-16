@@ -18,17 +18,17 @@ import (
 
 // ExtraCommand is a definition of user extra command that should be executed in place of terraform
 type ExtraCommand struct {
-	TerragruntExtensionBase `hcl:",squash"`
+	TerragruntExtensionBase `hcl:",squash,omitempty"`
 
-	Commands     []string `hcl:"commands"`
-	Aliases      []string `hcl:"aliases"`
-	Arguments    []string `hcl:"arguments"`
-	ExpandArgs   *bool    `hcl:"expand_args"`
-	UseState     *bool    `hcl:"use_state"`
-	ActAs        string   `hcl:"act_as"`
-	VersionArg   string   `hcl:"version"`
-	ShellCommand bool     `hcl:"shell_command"` // This indicates that the command is a shell command and output should not be redirected
-	IgnoreError  bool     `hcl:"ignore_error"`
+	Commands     []string `hcl:"commands,omitempty"`
+	Aliases      []string `hcl:"aliases,omitempty"`
+	Arguments    []string `hcl:"arguments,omitempty"`
+	ExpandArgs   *bool    `hcl:"expand_args,omitempty"`
+	UseState     *bool    `hcl:"use_state,omitempty"`
+	ActAs        string   `hcl:"act_as,omitempty"`
+	VersionArg   string   `hcl:"version,omitempty"`
+	ShellCommand bool     `hcl:"shell_command,omitempty"` // This indicates that the command is a shell command and output should not be redirected
+	IgnoreError  bool     `hcl:"ignore_error,omitempty"`
 }
 
 func (item ExtraCommand) itemType() (result string) { return ExtraCommandList{}.argName() }

@@ -10,11 +10,11 @@ import (
 // ApprovalConfig represents an `expect` format configuration that instructs terragrunt to wait for input on an ExpectStatement
 // and to exit the command on a CompletedStatement
 type ApprovalConfig struct {
-	TerragruntExtensionBase `hcl:",squash"`
+	TerragruntExtensionBase `hcl:",squash,omitempty"`
 
-	Commands            []string `hcl:"commands"`
-	ExpectStatements    []string `hcl:"expect_statements"`
-	CompletedStatements []string `hcl:"completed_statements"`
+	Commands            []string `hcl:"commands,omitempty"`
+	ExpectStatements    []string `hcl:"expect_statements,omitempty"`
+	CompletedStatements []string `hcl:"completed_statements,omitempty"`
 }
 
 func (item ApprovalConfig) itemType() (result string) { return ApprovalConfigList{}.argName() }

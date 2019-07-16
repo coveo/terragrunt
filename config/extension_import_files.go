@@ -14,22 +14,22 @@ import (
 // ImportFiles is a configuration of files that must be imported from another directory to the terraform directory
 // prior executing terraform commands
 type ImportFiles struct {
-	TerragruntExtensionBase `hcl:",squash"`
+	TerragruntExtensionBase `hcl:",squash,omitempty"`
 
-	Source            string          `hcl:"source"`
-	Files             []string        `hcl:"files"`
-	CopyAndRename     []copyAndRename `hcl:"copy_and_remove"`
-	Required          *bool           `hcl:"required,omitempty"`
-	ImportIntoModules bool            `hcl:"import_into_modules"`
-	FileMode          *int            `hcl:"file_mode"`
-	Target            string          `hcl:"target"`
-	Prefix            *string         `hcl:"prefix"`
+	Source            string          `hcl:"source,omitempty"`
+	Files             []string        `hcl:"files,omitempty"`
+	CopyAndRename     []copyAndRename `hcl:"copy_and_remove,omitempty"`
+	Required          *bool           `hcl:"required,omitempty,omitempty"`
+	ImportIntoModules bool            `hcl:"import_into_modules,omitempty"`
+	FileMode          *int            `hcl:"file_mode,omitempty"`
+	Target            string          `hcl:"target,omitempty"`
+	Prefix            *string         `hcl:"prefix,omitempty"`
 }
 
 // CopyAndRename is a structure used by ImportFiles to rename the imported files
 type copyAndRename struct {
-	Source string `hcl:"source"`
-	Target string `hcl:"target"`
+	Source string `hcl:"source,omitempty"`
+	Target string `hcl:"target,omitempty"`
 }
 
 func (item ImportFiles) itemType() (result string) { return ImportFilesList{}.argName() }

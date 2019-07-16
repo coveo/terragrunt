@@ -15,17 +15,17 @@ import (
 
 // Hook is a definition of user command that should be executed as part of the terragrunt process
 type Hook struct {
-	TerragruntExtensionBase `hcl:",squash"`
+	TerragruntExtensionBase `hcl:",squash,omitempty"`
 
-	Command        string   `hcl:"command"`
-	Arguments      []string `hcl:"arguments"`
-	ExpandArgs     bool     `hcl:"expand_args"`
-	OnCommands     []string `hcl:"on_commands"`
-	IgnoreError    bool     `hcl:"ignore_error"`
-	BeforeImports  bool     `hcl:"before_imports"`
-	AfterInitState bool     `hcl:"after_init_state"`
-	Order          int      `hcl:"order"`
-	ShellCommand   bool     `hcl:"shell_command"` // This indicates that the command is a shell command and output should not be redirected
+	Command        string   `hcl:"command,omitempty"`
+	Arguments      []string `hcl:"arguments,omitempty"`
+	ExpandArgs     bool     `hcl:"expand_args,omitempty"`
+	OnCommands     []string `hcl:"on_commands,omitempty"`
+	IgnoreError    bool     `hcl:"ignore_error,omitempty"`
+	BeforeImports  bool     `hcl:"before_imports,omitempty"`
+	AfterInitState bool     `hcl:"after_init_state,omitempty"`
+	Order          int      `hcl:"order,omitempty"`
+	ShellCommand   bool     `hcl:"shell_command,omitempty"` // This indicates that the command is a shell command and output should not be redirected
 }
 
 func (hook Hook) itemType() (result string) { return HookList{}.argName() }

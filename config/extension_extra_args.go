@@ -9,13 +9,13 @@ import (
 
 // TerraformExtraArguments sets a list of arguments to pass to Terraform if command fits any in the `Commands` list
 type TerraformExtraArguments struct {
-	TerragruntExtensionBase `hcl:",squash"`
+	TerragruntExtensionBase `hcl:",squash,omitempty"`
 
-	Source           string   `hcl:"source"`
-	Arguments        []string `hcl:"arguments"`
-	RequiredVarFiles []string `hcl:"required_var_files"`
-	OptionalVarFiles []string `hcl:"optional_var_files"`
-	Commands         []string `hcl:"commands"`
+	Source           string   `hcl:"source,omitempty"`
+	Arguments        []string `hcl:"arguments,omitempty"`
+	RequiredVarFiles []string `hcl:"required_var_files,omitempty"`
+	OptionalVarFiles []string `hcl:"optional_var_files,omitempty"`
+	Commands         []string `hcl:"commands,omitempty"`
 }
 
 func (item TerraformExtraArguments) itemType() (result string) {

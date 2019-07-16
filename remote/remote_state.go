@@ -15,8 +15,8 @@ import (
 
 // Configuration for Terraform remote state
 type RemoteState struct {
-	Backend string                 `hcl:"backend"`
-	Config  map[string]interface{} `hcl:"config"`
+	Backend string                 `hcl:"backend,omitempty"`
+	Config  map[string]interface{} `hcl:"config,omitempty"`
 }
 
 func (remoteState *RemoteState) String() string {

@@ -15,17 +15,17 @@ import (
 )
 
 type ImportVariables struct {
-	TerragruntExtensionBase `hcl:",squash"`
+	TerragruntExtensionBase `hcl:",squash,omitempty"`
 
-	Source           string   `hcl:"source"`
-	Vars             []string `hcl:"vars"`
-	RequiredVarFiles []string `hcl:"required_var_files"`
-	OptionalVarFiles []string `hcl:"optional_var_files"`
+	Source           string   `hcl:"source,omitempty"`
+	Vars             []string `hcl:"vars,omitempty"`
+	RequiredVarFiles []string `hcl:"required_var_files,omitempty"`
+	OptionalVarFiles []string `hcl:"optional_var_files,omitempty"`
 
-	NestedUnder string `hcl:"nested_under"`
+	NestedUnder string `hcl:"nested_under,omitempty"`
 
-	TFVariablesFile string `hcl:"output_variables_file"`
-	FlattenLevels   *int   `hcl:"flatten_levels"`
+	TFVariablesFile string `hcl:"output_variables_file,omitempty"`
+	FlattenLevels   *int   `hcl:"flatten_levels,omitempty"`
 }
 
 func (item ImportVariables) itemType() (result string) {

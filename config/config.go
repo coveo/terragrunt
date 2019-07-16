@@ -31,20 +31,20 @@ const (
 
 // TerragruntConfig represents a parsed and expanded configuration
 type TerragruntConfig struct {
-	Description    string              `hcl:"description"`
-	RunConditions  RunConditions       `hcl:"run_conditions"`
-	Terraform      *TerraformConfig    `hcl:"terraform"`
-	RemoteState    *remote.RemoteState `hcl:"remote_state"`
-	Dependencies   *ModuleDependencies `hcl:"dependencies"`
-	Uniqueness     *string             `hcl:"uniqueness_criteria"`
-	AssumeRole     interface{}         `hcl:"assume_role"`
-	PreHooks       HookList            `hcl:"pre_hook"`
-	PostHooks      HookList            `hcl:"post_hook"`
-	ExtraCommands  ExtraCommandList    `hcl:"extra_command"`
-	ImportFiles    ImportFilesList     `hcl:"import_files"`
-	ApprovalConfig ApprovalConfigList  `hcl:"approval_config"`
+	Description    string              `hcl:"description,omitempty"`
+	RunConditions  RunConditions       `hcl:"run_conditions,omitempty"`
+	Terraform      *TerraformConfig    `hcl:"terraform,omitempty"`
+	RemoteState    *remote.RemoteState `hcl:"remote_state,omitempty"`
+	Dependencies   *ModuleDependencies `hcl:"dependencies,omitempty"`
+	Uniqueness     *string             `hcl:"uniqueness_criteria,omitempty"`
+	AssumeRole     interface{}         `hcl:"assume_role,omitempty"`
+	PreHooks       HookList            `hcl:"pre_hook,omitempty"`
+	PostHooks      HookList            `hcl:"post_hook,omitempty"`
+	ExtraCommands  ExtraCommandList    `hcl:"extra_command,omitempty"`
+	ImportFiles    ImportFilesList     `hcl:"import_files,omitempty"`
+	ApprovalConfig ApprovalConfigList  `hcl:"approval_config,omitempty"`
 
-	ImportVariables ImportVariablesList `hcl:"import_variables"`
+	ImportVariables ImportVariablesList `hcl:"import_variables,omitempty"`
 
 	options *options.TerragruntOptions
 }
@@ -71,7 +71,7 @@ func (conf TerragruntConfig) globFiles(pattern string, folders ...string) (resul
 
 // TerragruntConfigFile represents the configuration supported in a Terragrunt configuration file (i.e. terraform.tfvars or .terragrunt)
 type TerragruntConfigFile struct {
-	TerragruntConfig `hcl:",squash"`
+	TerragruntConfig `hcl:",squash,omitempty"`
 	Include          *IncludeConfig
 	Lock             *LockConfig
 	Path             string
@@ -163,8 +163,8 @@ type tfvarsFileWithTerragruntConfig struct {
 // IncludeConfig represents the configuration settings for a parent Terragrunt configuration file that you can
 // "include" in a child Terragrunt configuration file
 type IncludeConfig struct {
-	Source       string `hcl:"source"`
-	Path         string `hcl:"path"`
+	Source       string `hcl:"source,omitempty"`
+	Path         string `hcl:"path,omitempty"`
 	isIncludedBy *IncludeConfig
 	isBootstrap  bool
 }
@@ -180,7 +180,7 @@ func (include IncludeConfig) String() string {
 // ModuleDependencies represents the paths to other Terraform modules that must be applied before the current module
 // can be applied
 type ModuleDependencies struct {
-	Paths []string `hcl:"paths"`
+	Paths []string `hcl:"paths,omitempty"`
 }
 
 func (deps *ModuleDependencies) String() string {
@@ -189,8 +189,8 @@ func (deps *ModuleDependencies) String() string {
 
 // TerraformConfig specifies where to find the Terraform configuration files
 type TerraformConfig struct {
-	ExtraArgs TerraformExtraArgumentsList `hcl:"extra_arguments"`
-	Source    string                      `hcl:"source"`
+	ExtraArgs TerraformExtraArgumentsList `hcl:"extra_arguments,omitempty"`
+	Source    string                      `hcl:"source,omitempty"`
 }
 
 func (conf TerraformConfig) String() string {

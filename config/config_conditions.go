@@ -11,8 +11,8 @@ import (
 
 // RunConditions defines the rules that are evaluated in order to determine
 type RunConditions struct {
-	Allows []Condition `hcl:"run_if"`
-	Denies []Condition `hcl:"ignore_if"`
+	Allows []Condition `hcl:"run_if,omitempty"`
+	Denies []Condition `hcl:"ignore_if,omitempty"`
 }
 
 func (c RunConditions) String() (result string) {
