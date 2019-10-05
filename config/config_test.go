@@ -20,12 +20,12 @@ func TestParseTerragruntConfigRemoteStateMinimalConfig(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  remote_state {
-    backend = "s3"
-  }
-}
-`
+		terragrunt = {
+		  remote_state {
+		    backend = "s3"
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -44,11 +44,11 @@ func TestParseTerragruntConfigRemoteStateMissingBackend(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  remote_state {
-  }
-}
-`
+		terragrunt = {
+		  remote_state {
+		  }
+		}
+	`
 
 	_, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	assert.True(t, errors.IsError(err, remote.RemoteBackendMissing), "Unexpected error of type %s: %s", reflect.TypeOf(err), err)
@@ -58,18 +58,18 @@ func TestParseTerragruntConfigRemoteStateFullConfig(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  remote_state {
-    backend = "s3"
-    config {
-      encrypt = true
-      bucket = "my-bucket"
-      key = "terraform.tfstate"
-      region = "us-east-1"
-    }
-  }
-}
-`
+		terragrunt = {
+		  remote_state {
+		    backend = "s3"
+		    config {
+		      encrypt = true
+		      bucket = "my-bucket"
+		      key = "terraform.tfstate"
+		      region = "us-east-1"
+		    }
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -92,12 +92,12 @@ func TestParseTerragruntConfigDependenciesOnePath(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  dependencies {
-    paths = ["../vpc"]
-  }
-}
-`
+		terragrunt = {
+		  dependencies {
+		    paths = ["../vpc"]
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -116,12 +116,12 @@ func TestParseTerragruntConfigDependenciesMultiplePaths(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  dependencies {
-    paths = ["../vpc", "../mysql", "../backend-app"]
-  }
-}
-`
+		terragrunt = {
+		  dependencies {
+		    paths = ["../vpc", "../mysql", "../backend-app"]
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -140,26 +140,72 @@ func TestParseTerragruntConfigRemoteStateDynamoDbTerraformConfigAndDependenciesF
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  terraform {
-    source = "foo"
-  }
+		terragrunt = {
+		  terraform {
+		    source = "foo"
+		  }
+		
+		  remote_state {
+		    backend = "s3"
+		    config {
+		      encrypt = true
+		      bucket = "my-bucket"
+		      key = "terraform.tfstate"
+		      region = "us-east-1"
+		    }
+		  }
+		
+		  dependencies {
+		    paths = ["../vpc", "../mysql", "../backend-app"]
+		  }
+		}
+	`
 
-  remote_state {
-    backend = "s3"
-    config {
-      encrypt = true
-      bucket = "my-bucket"
-      key = "terraform.tfstate"
-      region = "us-east-1"
-    }
-  }
+	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-  dependencies {
-    paths = ["../vpc", "../mysql", "../backend-app"]
-  }
+	if assert.NotNil(t, terragruntConfig.Terraform) {
+		assert.Equal(t, "foo", terragruntConfig.Terraform.Source)
+	}
+
+	if assert.NotNil(t, terragruntConfig.RemoteState) {
+		assert.Equal(t, "s3", terragruntConfig.RemoteState.Backend)
+		assert.NotEmpty(t, terragruntConfig.RemoteState.Config)
+		assert.Equal(t, true, terragruntConfig.RemoteState.Config["encrypt"])
+		assert.Equal(t, "my-bucket", terragruntConfig.RemoteState.Config["bucket"])
+		assert.Equal(t, "terraform.tfstate", terragruntConfig.RemoteState.Config["key"])
+		assert.Equal(t, "us-east-1", terragruntConfig.RemoteState.Config["region"])
+	}
+
+	if assert.NotNil(t, terragruntConfig.Dependencies) {
+		assert.Equal(t, []string{"../vpc", "../mysql", "../backend-app"}, terragruntConfig.Dependencies.Paths)
+	}
 }
-`
+
+func TestParseTerragruntConfigRemoteStateDynamoDbTerraformConfigAndDependenciesFullConfigOldConfigFormat(t *testing.T) {
+	t.Parallel()
+
+	config := `
+		terraform {
+		  source = "foo"
+		}
+
+		remote_state {
+		  backend = "s3"
+		  config {
+		    encrypt = true
+		    bucket = "my-bucket"
+		    key = "terraform.tfstate"
+		    region = "us-east-1"
+		  }
+		}
+
+		dependencies {
+		  paths = ["../vpc", "../mysql", "../backend-app"]
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -187,14 +233,13 @@ terragrunt = {
 func TestParseTerragruntConfigInclude(t *testing.T) {
 	t.Parallel()
 
-	config :=
-		fmt.Sprintf(`
-terragrunt = {
-  include {
-    path = "../../../%s"
-  }
-}
-`, DefaultTerragruntConfigPath)
+	config := fmt.Sprintf(`
+		terragrunt = {
+		  include {
+		    path = "../../../%s"
+		  }
+		}
+	`, DefaultTerragruntConfigPath)
 
 	opts := options.NewTerragruntOptionsForTest("../test/fixture-parent-folders/terragrunt-in-root/child/sub-child/sub-sub-child/" + DefaultTerragruntConfigPath)
 	terragruntConfig, err := parseConfigString(config, opts, IncludeConfig{Path: opts.TerragruntConfigPath}, nil)
@@ -217,12 +262,12 @@ func TestParseTerragruntConfigIncludeWithFindInParentFolders(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  include {
-    path = "${find_in_parent_folders()}"
-  }
-}
-`
+		terragrunt = {
+		  include {
+		    path = "${find_in_parent_folders()}"
+		  }
+		}
+	`
 
 	opts := options.NewTerragruntOptionsForTest("../test/fixture-parent-folders/terragrunt-in-root/child/sub-child/sub-sub-child/" + DefaultTerragruntConfigPath)
 	terragruntConfig, err := parseConfigString(config, opts, IncludeConfig{Path: opts.TerragruntConfigPath}, nil)
@@ -244,25 +289,24 @@ terragrunt = {
 func TestParseTerragruntConfigIncludeOverrideRemote(t *testing.T) {
 	t.Parallel()
 
-	config :=
-		fmt.Sprintf(`
-terragrunt = {
-  include {
-    path = "../../../%s"
-  }
-
-  # Configure Terragrunt to automatically store tfstate files in an S3 bucket
-  remote_state {
-    backend = "s3"
-    config {
-      encrypt = false
-      bucket = "override"
-      key = "override"
-      region = "override"
-    }
-  }
-}
-`, DefaultTerragruntConfigPath)
+	config := fmt.Sprintf(`
+		terragrunt = {
+		  include {
+		    path = "../../../%s"
+		  }
+	  
+		  # Configure Terragrunt to automatically store tfstate files in an S3 bucket
+		  remote_state {
+		    backend = "s3"
+		    config {
+		      encrypt = false
+		      bucket = "override"
+		      key = "override"
+		      region = "override"
+		    }
+		  }
+		}
+	`, DefaultTerragruntConfigPath)
 
 	opts := options.NewTerragruntOptionsForTest("../test/fixture-parent-folders/terragrunt-in-root/child/sub-child/sub-sub-child/" + DefaultTerragruntConfigPath)
 	terragruntConfig, err := parseConfigString(config, opts, IncludeConfig{Path: opts.TerragruntConfigPath}, nil)
@@ -284,33 +328,32 @@ terragrunt = {
 func TestParseTerragruntConfigIncludeOverrideAll(t *testing.T) {
 	t.Parallel()
 
-	config :=
-		fmt.Sprintf(`
-terragrunt = {
-  include {
-    path = "../../../%s"
-  }
-
-  terraform {
-    source = "foo"
-  }
-
-  # Configure Terragrunt to automatically store tfstate files in an S3 bucket
-  remote_state {
-    backend = "s3"
-    config {
-      encrypt = false
-      bucket = "override"
-      key = "override"
-      region = "override"
-    }
-  }
-
-  dependencies {
-    paths = ["override"]
-  }
-}
-`, DefaultTerragruntConfigPath)
+	config := fmt.Sprintf(`
+		terragrunt = {
+		  include {
+		    path = "../../../%s"
+		  }
+	  
+		  terraform {
+		    source = "foo"
+		  }
+	  
+		  # Configure Terragrunt to automatically store tfstate files in an S3 bucket
+		  remote_state {
+		    backend = "s3"
+		    config {
+		      encrypt = false
+		      bucket = "override"
+		      key = "override"
+		      region = "override"
+		    }
+		  }
+	  
+		  dependencies {
+		    paths = ["override"]
+		  }
+		}
+	`, DefaultTerragruntConfigPath)
 
 	opts := options.NewTerragruntOptionsForTest("../test/fixture-parent-folders/terragrunt-in-root/child/sub-child/sub-sub-child/" + DefaultTerragruntConfigPath)
 	terragruntConfig, err := parseConfigString(config, opts, IncludeConfig{Path: opts.TerragruntConfigPath}, nil)
@@ -439,7 +482,7 @@ func getExtraArgsConfig(options *options.TerragruntOptions, argConfigs ...argCon
 		base.config().options = options
 		args = append(args, TerraformExtraArguments{TerragruntExtensionBase: base, Arguments: argConfig.extraArgs})
 	}
-	return TerragruntConfig{Terraform: &TerraformConfig{ExtraArgs: args}}
+	return TerragruntConfig{ExtraArgs: args}
 }
 
 func TestMergeConfigIntoIncludedConfig(t *testing.T) {
@@ -504,11 +547,11 @@ func TestParseTerragruntConfigTerraformNoSource(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  terraform {
-  }
-}
-`
+		terragrunt = {
+		  terraform {
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -527,12 +570,12 @@ func TestParseTerragruntConfigTerraformWithSource(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  terraform {
-    source = "foo"
-  }
-}
-`
+		terragrunt = {
+		  terraform {
+		    source = "foo"
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -551,18 +594,18 @@ func TestParseTerragruntConfigTerraformWithExtraArguments(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  terraform {
-    extra_arguments "secrets" {
-      arguments = [
-        "-var-file=terraform.tfvars",
-        "-var-file=terraform-secret.tfvars"
-      ]
-      commands = ["${get_terraform_commands_that_need_vars()}"]
-    }
-  }
-}
-`
+		terragrunt = {
+		  terraform {
+		    extra_arguments "secrets" {
+		      arguments = [
+		        "-var-file=terraform.tfvars",
+		        "-var-file=terraform-secret.tfvars"
+		      ]
+		      commands = ["${get_terraform_commands_that_need_vars()}"]
+		    }
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -572,62 +615,60 @@ terragrunt = {
 	assert.Nil(t, terragruntConfig.RemoteState)
 	assert.Nil(t, terragruntConfig.Dependencies)
 
-	if assert.NotNil(t, terragruntConfig.Terraform) {
-		assert.Equal(t, "secrets", terragruntConfig.Terraform.ExtraArgs[0].Name)
-		assert.Equal(t,
-			[]string{
-				"-var-file=terraform.tfvars",
-				"-var-file=terraform-secret.tfvars",
-			},
-			terragruntConfig.Terraform.ExtraArgs[0].Arguments)
-		assert.Equal(t,
-			TerraformCommandWithVarFile,
-			terragruntConfig.Terraform.ExtraArgs[0].Commands)
-	}
+	assert.Equal(t, "secrets", terragruntConfig.ExtraArgs[0].Name)
+	assert.Equal(t,
+		[]string{
+			"-var-file=terraform.tfvars",
+			"-var-file=terraform-secret.tfvars",
+		},
+		terragruntConfig.ExtraArgs[0].Arguments)
+	assert.Equal(t,
+		TerraformCommandWithVarFile,
+		terragruntConfig.ExtraArgs[0].Commands)
 }
 
 func TestParseTerragruntConfigTerraformWithMultipleExtraArguments(t *testing.T) {
 	t.Parallel()
 
 	config := `
-terragrunt = {
-  terraform {
-    extra_arguments "json_output" {
-      arguments = [
-        "-json"
-      ]
-      commands = [
-        "output"
-      ]
-    }
-
-    extra_arguments "fmt_diff" {
-      arguments = [
-        "-diff=true"
-      ]
-      commands = [
-        "fmt"
-      ]
-    }
-
-    extra_arguments "required_tfvars" {
-      required_var_files = [
-        "file1.tfvars",
-				"file2.tfvars"
-      ]
-      commands = ["${get_terraform_commands_that_need_vars()}"]
-    }
-
-    extra_arguments "optional_tfvars" {
-      optional_var_files = [
-        "opt1.tfvars",
-				"opt2.tfvars"
-      ]
-      commands = ["${get_terraform_commands_that_need_vars()}"]
-    }
-  }
-}
-`
+		terragrunt = {
+		  terraform {
+		    extra_arguments "json_output" {
+		      arguments = [
+		        "-json"
+		      ]
+		      commands = [
+		        "output"
+		      ]
+		    }
+		
+		    extra_arguments "fmt_diff" {
+		      arguments = [
+		        "-diff=true"
+		      ]
+		      commands = [
+		        "fmt"
+		      ]
+		    }
+		
+		    extra_arguments "required_tfvars" {
+		      required_var_files = [
+		        "file1.tfvars",
+						"file2.tfvars"
+		      ]
+		      commands = ["${get_terraform_commands_that_need_vars()}"]
+		    }
+		
+		    extra_arguments "optional_tfvars" {
+		      optional_var_files = [
+		        "opt1.tfvars",
+						"opt2.tfvars"
+		      ]
+		      commands = ["${get_terraform_commands_that_need_vars()}"]
+		    }
+		  }
+		}
+	`
 
 	terragruntConfig, err := parseConfigString(config, mockOptions, mockDefaultInclude, nil)
 	if err != nil {
@@ -636,21 +677,18 @@ terragrunt = {
 
 	assert.Nil(t, terragruntConfig.RemoteState)
 	assert.Nil(t, terragruntConfig.Dependencies)
-
-	if assert.NotNil(t, terragruntConfig.Terraform) {
-		assert.Equal(t, "json_output", terragruntConfig.Terraform.ExtraArgs[0].Name)
-		assert.Equal(t, []string{"-json"}, terragruntConfig.Terraform.ExtraArgs[0].Arguments)
-		assert.Equal(t, []string{"output"}, terragruntConfig.Terraform.ExtraArgs[0].Commands)
-		assert.Equal(t, "fmt_diff", terragruntConfig.Terraform.ExtraArgs[1].Name)
-		assert.Equal(t, []string{"-diff=true"}, terragruntConfig.Terraform.ExtraArgs[1].Arguments)
-		assert.Equal(t, []string{"fmt"}, terragruntConfig.Terraform.ExtraArgs[1].Commands)
-		assert.Equal(t, "required_tfvars", terragruntConfig.Terraform.ExtraArgs[2].Name)
-		assert.Equal(t, []string{"file1.tfvars", "file2.tfvars"}, terragruntConfig.Terraform.ExtraArgs[2].RequiredVarFiles)
-		assert.Equal(t, TerraformCommandWithVarFile, terragruntConfig.Terraform.ExtraArgs[2].Commands)
-		assert.Equal(t, "optional_tfvars", terragruntConfig.Terraform.ExtraArgs[3].Name)
-		assert.Equal(t, []string{"opt1.tfvars", "opt2.tfvars"}, terragruntConfig.Terraform.ExtraArgs[3].OptionalVarFiles)
-		assert.Equal(t, TerraformCommandWithVarFile, terragruntConfig.Terraform.ExtraArgs[3].Commands)
-	}
+	assert.Equal(t, "json_output", terragruntConfig.ExtraArgs[0].Name)
+	assert.Equal(t, []string{"-json"}, terragruntConfig.ExtraArgs[0].Arguments)
+	assert.Equal(t, []string{"output"}, terragruntConfig.ExtraArgs[0].Commands)
+	assert.Equal(t, "fmt_diff", terragruntConfig.ExtraArgs[1].Name)
+	assert.Equal(t, []string{"-diff=true"}, terragruntConfig.ExtraArgs[1].Arguments)
+	assert.Equal(t, []string{"fmt"}, terragruntConfig.ExtraArgs[1].Commands)
+	assert.Equal(t, "required_tfvars", terragruntConfig.ExtraArgs[2].Name)
+	assert.Equal(t, []string{"file1.tfvars", "file2.tfvars"}, terragruntConfig.ExtraArgs[2].RequiredVarFiles)
+	assert.Equal(t, TerraformCommandWithVarFile, terragruntConfig.ExtraArgs[2].Commands)
+	assert.Equal(t, "optional_tfvars", terragruntConfig.ExtraArgs[3].Name)
+	assert.Equal(t, []string{"opt1.tfvars", "opt2.tfvars"}, terragruntConfig.ExtraArgs[3].OptionalVarFiles)
+	assert.Equal(t, TerraformCommandWithVarFile, terragruntConfig.ExtraArgs[3].Commands)
 }
 
 func TestFindConfigFilesInPathNone(t *testing.T) {

@@ -58,7 +58,7 @@ func PrintDoc(terragruntOptions *options.TerragruntOptions, conf *config.Terragr
 		}
 	}
 
-	print("Extra arguments: (in evaluation order)", "%s\n", conf.Terraform.ExtraArgs.Help(*listOnly, *filters...), *extraArgs)
+	print("Extra arguments: (in evaluation order)", "%s\n", conf.ExtraArgs.Help(*listOnly, *filters...), *extraArgs)
 	print("Import variables: (in evaluation order)", "%s\n", conf.ImportVariables.Help(*listOnly, *filters...), *importVars)
 
 	if *hooks || all {

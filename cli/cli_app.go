@@ -224,6 +224,7 @@ func runCommand(command string, terragruntOptions *options.TerragruntOptions) (f
 	}
 	isMultiModules := command == getStackCommand || strings.HasSuffix(command, multiModuleSuffix)
 	terragruntOptions.Context = map[string]interface{}{
+		"Version":              terragruntVersion,
 		"AwsProfile":           terragruntOptions.AwsProfile,
 		"DownloadDir":          terragruntOptions.DownloadDir,
 		"LoggingLevel":         int(util.GetLoggingLevel()),
@@ -295,6 +296,7 @@ func runTerragrunt(terragruntOptions *options.TerragruntOptions) (finalStatus er
 	// Check if the current command is an extra command
 	actualCommand := conf.ExtraCommands.ActualCommand(terragruntOptions.TerraformCliArgs[0])
 	ignoreError := actualCommand.Extra != nil && actualCommand.Extra.IgnoreError
+	terragruntOptions.Env[options.EnvCommand] = terragruntOptions.TerraformCliArgs[0]
 
 	stopOnError := func(err error) bool {
 		if err == nil {
@@ -324,7 +326,7 @@ func runTerragrunt(terragruntOptions *options.TerragruntOptions) (finalStatus er
 		return err
 	}
 
-	useTempFolder := hasSourceURL || len(conf.ImportFiles) > 0 || conf.ImportVariables.CreatesVariableFile()
+	useTempFolder := hasSourceURL || len(conf.ImportFiles) > 0 || conf.ImportVariables.ShouldCreateVariablesFile()
 	if useTempFolder {
 		// If there are import files, we force the usage of a temp directory.
 		if err = downloadTerraformSource(terraformSource, terragruntOptions); stopOnError(err) {
@@ -336,10 +338,10 @@ func runTerragrunt(terragruntOptions *options.TerragruntOptions) (finalStatus er
 		return
 	}
 
-	conf.SubstituteAllVariables(terragruntOptions, false)
+	conf.SubstituteAllVariables()
 
 	// Applying the extra arguments
-	if conf.Terraform != nil && len(conf.Terraform.ExtraArgs) > 0 {
+	if len(conf.ExtraArgs) > 0 {
 		commandLength := 1
 		if util.ListContainsElement(terraformCommandsWithSubCommand, terragruntOptions.TerraformCliArgs[0]) {
 			commandLength = 2
@@ -359,7 +361,7 @@ func runTerragrunt(terragruntOptions *options.TerragruntOptions) (finalStatus er
 		}
 		terragruntOptions.TerraformCliArgs = args
 
-		conf.SubstituteAllVariables(terragruntOptions, false)
+		conf.SubstituteAllVariables()
 	}
 
 	// Determinate if the project should be ignored
@@ -367,7 +369,7 @@ func runTerragrunt(terragruntOptions *options.TerragruntOptions) (finalStatus er
 		return nil
 	}
 
-	conf.SubstituteAllVariables(terragruntOptions, true)
+	conf.SubstituteAllVariables()
 
 	// Executing the pre-hook commands that should be ran before the ImportFiles
 	if _, err = conf.PreHooks.Filter(config.BeforeImports).Run(err); stopOnError(err) {
@@ -387,7 +389,7 @@ func runTerragrunt(terragruntOptions *options.TerragruntOptions) (finalStatus er
 	}
 
 	terragruntOptions.IgnoreRemainingInterpolation = false
-	conf.SubstituteAllVariables(terragruntOptions, true)
+	conf.SubstituteAllVariables()
 
 	if actualCommand.Command == "get-versions" {
 		PrintVersions(terragruntOptions, conf)
@@ -424,7 +426,6 @@ func runTerragrunt(terragruntOptions *options.TerragruntOptions) (finalStatus er
 		}
 	}
 
-	terragruntOptions.Env[options.EnvCommand] = terragruntOptions.TerraformCliArgs[0]
 	if actualCommand.Extra != nil {
 		terragruntOptions.Env[options.EnvExtraCommand] = actualCommand.Command
 	}

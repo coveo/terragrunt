@@ -26,6 +26,7 @@ type TerragruntExtensioner interface {
 	order() int
 	compare(TerragruntExtensioner) bool
 	normalize()
+	substituteVars() // Used to replace variables by their real values
 	options() *options.TerragruntOptions
 }
 
@@ -47,6 +48,7 @@ func (base TerragruntExtensionBase) description() string { return base.Descripti
 func (base TerragruntExtensionBase) order() int          { return base.Order }
 func (base TerragruntExtensionBase) extraInfo() string   { return "" }
 func (base TerragruntExtensionBase) normalize()          {}
+func (base TerragruntExtensionBase) substituteVars()     { base.config().substitute(&base.Description) }
 
 func (base TerragruntExtensionBase) compare(other TerragruntExtensioner) bool {
 	return base.Order < other.order()
